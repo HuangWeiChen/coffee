@@ -1,174 +1,209 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var selectedDrink: Drink?
+    @State private var selectedDrink = 0
+    @State private var drinkName = ""
+    @State private var message = "請選擇一杯飲品"
+    @State private var imageName = "cup.and.saucer.fill"
+    @State private var sweetness = "微糖"
+    @State private var size = "中杯"
+    @State private var isFinished = false
 
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color.brown.opacity(0.18), Color.orange.opacity(0.08)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-
-            ScrollView {
-                VStack(spacing: 28) {
-                    header
-                    coffeeDisplay
-                    drinkButtons
-                }
-                .padding(24)
-                .frame(maxWidth: 560)
-                .frame(maxWidth: .infinity)
-            }
-        }
-    }
-
-    private var header: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             Text("晨光咖啡機")
-                .font(.largeTitle.bold())
+                .font(.largeTitle)
+                .bold()
+                .foregroundColor(.brown)
 
-            Text("選擇一杯飲品，開始你的美好一天")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-    }
+            VStack(spacing: 8) {
+                if isFinished {
+                    HStack(spacing: 20) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
 
-    private var coffeeDisplay: some View {
-        VStack(spacing: 20) {
-            Image(systemName: selectedDrink?.systemImage ?? "cup.and.saucer.fill")
-                .font(.system(size: 84))
-                .foregroundStyle(selectedDrink?.color ?? .brown)
-                .symbolEffect(.bounce, value: selectedDrink)
-                .accessibilityHidden(true)
+                        Image(systemName: imageName)
+                            .foregroundColor(.brown)
+                    }
+                    .font(.system(size: 58))
+                } else {
+                    Image(systemName: imageName)
+                        .font(.system(size: 75))
+                        .foregroundColor(.brown)
+                }
 
-            VStack(spacing: 6) {
-                Text(selectedDrink == nil ? "想喝點什麼？" : "\(selectedDrink!.name)完成了！")
-                    .font(.title2.bold())
-                    .contentTransition(.numericText())
-
-                Text(selectedDrink == nil ? "請點選下方飲品按鈕" : "小心燙口，請慢慢享用")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-            }
-            .multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity, minHeight: 260)
-        .padding(24)
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28))
-        .overlay {
-            RoundedRectangle(cornerRadius: 28)
-                .stroke(.white.opacity(0.55), lineWidth: 1)
-        }
-        .shadow(color: .brown.opacity(0.12), radius: 18, y: 10)
-        .animation(.spring(duration: 0.45), value: selectedDrink)
-    }
-
-    private var drinkButtons: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            Text("飲品選單")
-                .font(.headline)
-
-            HStack(spacing: 12) {
-                drinkButton(for: .americano)
-                drinkButton(for: .latte)
-                drinkButton(for: .cocoa)
-            }
-        }
-    }
-
-    private func drinkButton(for drink: Drink) -> some View {
-        let isSelected = selectedDrink == drink
-
-        return Button {
-            selectedDrink = drink
-        } label: {
-            VStack(spacing: 10) {
-                Image(systemName: drink.systemImage)
-                    .font(.title2)
-
-                Text(drink.name)
+                Text(message)
                     .font(.headline)
-                    .lineLimit(1)
-
-                Text(drink.detail)
-                    .font(.caption)
-                    .opacity(0.8)
+                    .multilineTextAlignment(.center)
             }
-            .foregroundStyle(isSelected ? Color.white : Color.primary)
-            .frame(maxWidth: .infinity, minHeight: 112)
-            .padding(.horizontal, 8)
-            .background(
-                isSelected ? drink.color : Color.white.opacity(0.72),
-                in: RoundedRectangle(cornerRadius: 20)
-            )
-            .overlay {
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(isSelected ? drink.color : Color.brown.opacity(0.14), lineWidth: 2)
+            .frame(maxWidth: .infinity)
+            .padding(10)
+            .background(Color.white)
+            .cornerRadius(15)
+            .shadow(color: Color.gray.opacity(0.3), radius: 5)
+
+            VStack(spacing: 7) {
+                HStack {
+                    Text("☕️ 選擇飲品")
+                        .font(.headline)
+                        .foregroundColor(.brown)
+
+                    Spacer()
+
+                    Button("🎲 隨機選擇") {
+                        let randomNumber = Int.random(in: 1...3)
+                        chooseDrink(randomNumber)
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.orange)
+                }
+
+                HStack(spacing: 10) {
+                    Button("美式") {
+                        chooseDrink(1)
+                    }
+                    .padding(9)
+                    .foregroundColor(selectedDrink == 1 ? .white : .brown)
+                    .background(selectedDrink == 1 ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+
+                    Button("拿鐵") {
+                        chooseDrink(2)
+                    }
+                    .padding(9)
+                    .foregroundColor(selectedDrink == 2 ? .white : .brown)
+                    .background(selectedDrink == 2 ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+
+                    Button("可可") {
+                        chooseDrink(3)
+                    }
+                    .padding(9)
+                    .foregroundColor(selectedDrink == 3 ? .white : .brown)
+                    .background(selectedDrink == 3 ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+                }
             }
-            .shadow(
-                color: isSelected ? drink.color.opacity(0.3) : .clear,
-                radius: 10,
-                y: 6
-            )
-            .scaleEffect(isSelected ? 1.04 : 1)
+            .frame(maxWidth: .infinity)
+            .padding(9)
+            .background(Color.white.opacity(0.8))
+            .cornerRadius(15)
+
+            VStack(spacing: 7) {
+                Text("🍬 選擇甜度")
+                    .font(.headline)
+                    .foregroundColor(.brown)
+
+                HStack(spacing: 10) {
+                    Button("無糖") {
+                        sweetness = "無糖"
+                        isFinished = false
+                    }
+                    .padding(9)
+                    .foregroundColor(sweetness == "無糖" ? .white : .brown)
+                    .background(sweetness == "無糖" ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+
+                    Button("微糖") {
+                        sweetness = "微糖"
+                        isFinished = false
+                    }
+                    .padding(9)
+                    .foregroundColor(sweetness == "微糖" ? .white : .brown)
+                    .background(sweetness == "微糖" ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+
+                    Button("正常糖") {
+                        sweetness = "正常糖"
+                        isFinished = false
+                    }
+                    .padding(9)
+                    .foregroundColor(sweetness == "正常糖" ? .white : .brown)
+                    .background(sweetness == "正常糖" ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(9)
+            .background(Color.white.opacity(0.8))
+            .cornerRadius(15)
+
+            VStack(spacing: 7) {
+                Text("🥤 選擇份量")
+                    .font(.headline)
+                    .foregroundColor(.brown)
+
+                HStack(spacing: 10) {
+                    Button("小杯") {
+                        size = "小杯"
+                        isFinished = false
+                    }
+                    .padding(9)
+                    .foregroundColor(size == "小杯" ? .white : .brown)
+                    .background(size == "小杯" ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+
+                    Button("中杯") {
+                        size = "中杯"
+                        isFinished = false
+                    }
+                    .padding(9)
+                    .foregroundColor(size == "中杯" ? .white : .brown)
+                    .background(size == "中杯" ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+
+                    Button("大杯") {
+                        size = "大杯"
+                        isFinished = false
+                    }
+                    .padding(9)
+                    .foregroundColor(size == "大杯" ? .white : .brown)
+                    .background(size == "大杯" ? Color.brown : Color.brown.opacity(0.15))
+                    .cornerRadius(10)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .padding(9)
+            .background(Color.white.opacity(0.8))
+            .cornerRadius(15)
+
+            Button("開始製作") {
+                startMaking()
+            }
+            .font(.headline)
+            .frame(maxWidth: .infinity)
+            .padding(12)
+            .foregroundColor(.white)
+            .background(selectedDrink == 0 ? Color.gray : Color.green)
+            .cornerRadius(12)
+            .disabled(selectedDrink == 0)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(drink.name)，\(drink.detail)")
-        .accessibilityValue(isSelected ? "已選取，製作完成" : "未選取")
+        .padding(18)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.orange.opacity(0.1).ignoresSafeArea())
     }
-}
 
-private enum Drink: Hashable {
-    case americano
-    case latte
-    case cocoa
+    func chooseDrink(_ number: Int) {
+        selectedDrink = number
+        isFinished = false
 
-    var name: String {
-        switch self {
-        case .americano:
-            "美式"
-        case .latte:
-            "拿鐵"
-        case .cocoa:
-            "可可"
+        if number == 1 {
+            drinkName = "美式咖啡"
+            imageName = "mug.fill"
+        } else if number == 2 {
+            drinkName = "拿鐵"
+            imageName = "cup.and.saucer.fill"
+        } else {
+            drinkName = "可可"
+            imageName = "takeoutbag.and.cup.and.straw.fill"
         }
+
+        message = "已選擇：\(drinkName)"
     }
 
-    var detail: String {
-        switch self {
-        case .americano:
-            "濃郁醒腦"
-        case .latte:
-            "香醇滑順"
-        case .cocoa:
-            "甜蜜溫暖"
-        }
-    }
-
-    var systemImage: String {
-        switch self {
-        case .americano:
-            "mug.fill"
-        case .latte:
-            "cup.and.saucer.fill"
-        case .cocoa:
-            "takeoutbag.and.cup.and.straw.fill"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .americano:
-            .brown
-        case .latte:
-            .orange
-        case .cocoa:
-            .pink
-        }
+    func startMaking() {
+        isFinished = true
+        message = "\(size) \(sweetness)的\(drinkName)完成了！"
     }
 }
 
