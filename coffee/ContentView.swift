@@ -11,7 +11,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Text("晨光咖啡機")
+            Text("小小咖啡機")
                 .font(.largeTitle)
                 .bold()
                 .foregroundColor(.brown)
